@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rate Your Experience</title>
+  <style>
+    :root {
+      --primary: #1a73e8;
+      --primary-hover: #1557b0;
+      --success: #0f9d58;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #202124;
+      --text-muted: #5f6368;
+      --border: #dadce0;
+      --chip-bg: #f1f3f4;
+      --chip-active: #e8f0fe;
+      --chip-border-active: #1a73e8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 460px;
+      padding: 24px 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      margin-top: 10px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      background: var(--chip-bg);
+      padding: 4px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .lang-btn {
+      border: none;
+      background: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .lang-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .star {
+      font-size: 30px;
+      color: #fbbc04;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 16px 0 10px;
+      color: var(--text);
+    }
+
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chip {
+      background: var(--chip-bg);
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .chip.active {
+      background: var(--chip-active);
+      border-color: var(--chip-border-active);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+      resize: none;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .action-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(26, 115, 232, 0.3);
+      transition: background 0.2s;
+    }
+
+    .action-btn:active {
+      transform: scale(0.99);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btnEn" onclick="switchLang('en')">English</button>
+        <button class="lang-btn" id="btnHi" onclick="switchLang('hi')">हिन्दी</button>
+      </div>
+
+      <div class="stars">
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+      </div>
+
+      <h1 id="titleText">How was your visit?</h1>
+      <p class="subtitle" id="subText">Tap what you liked to generate a quick review</p>
+    </div>
+
+    <div class="section-title" id="tagSectionTitle">Highlights:</div>
+    <div class="chips-group" id="tagsContainer"></div>
+
+    <div class="section-title" id="previewTitle">Generated Review:</div>
+    <textarea id="reviewOutput" placeholder="Your review preview will appear here..."></textarea>
+
+    <button class="action-btn" id="submitBtn" onclick="handleCopyAndRedirect()">
+      <span>📋</span> <span id="btnLabel">Copy & Open Google Reviews</span>
+    </button>
+
+    <p class="footer-note" id="helperNote">The text is automatically copied to your clipboard. Simply paste it on Google Maps!</p>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard! Redirecting...</div>
+
+  <script>
+    const GOOGLE_REVIEW_URL = "https://g.page/r/CRSy5Jf8z-eyEBM/review";
+
+    let currentLang = "en";
+    const selectedTags = new Set();
+
+    const content = {
+      en: {
+        title: "How was your visit?",
+        subtitle: "Tap what you liked to generate a quick review",
+        highlights: "Highlights:",
+        preview: "Generated Review:",
+        btnLabel: "Copy & Open Google Reviews",
+        note: "Review text copies to your clipboard. Just paste and tap Post!",
+        toast: "Copied! Opening Google Reviews...",
+        tags: [
+          { id: "pricing", label: "Best Prices", phrase: "genuine products at great and fair prices" },
+          { id: "staff", label: "Helpful Staff", phrase: "extremely polite and knowledgeable staff" },
+          { id: "repair", label: "Quick Service / Repair", phrase: "fast and reliable service" },
+          { id: "stock", label: "Wide Variety & Stock", phrase: "a huge range of smartphones and accessories available" },
+          { id: "trust", label: "Trustworthy", phrase: "honest recommendations and authentic warranty" },
+          { id: "deal", label: "Smooth Purchase", phrase: "a completely smooth and hassle-free buying experience" }
+        ],
+        template: (phrases) => `Had a great experience! Really satisfied with the ${phrases}. Highly recommended store!`
+      },
+      hi: {
+        title: "आपका अनुभव कैसा रहा?",
+        subtitle: "जो आपको पसंद आया उसे चुनें और रिव्यू बनाएं",
+        highlights: "मुख्य विशेषताएं:",
+        preview: "तैयार किया गया रिव्यू:",
+        btnLabel: "कॉपी करें और Google पर पोस्ट करें",
+        note: "टेक्स्ट कॉपी हो जाएगा। Google Maps खुलते ही सिर्फ पेस्ट करके पोस्ट करें!",
+        toast: "कॉपी हो गया! Google Reviews खुल रहा है...",
+        tags: [
+          { id: "pricing", label: "किफायती दाम", phrase: "उचित और सबसे अच्छे रेट पर ओरिजिनल सामान" },
+          { id: "staff", label: "बढ़िया व्यवहार", phrase: "दुकानदार और स्टाफ का बहुत ही विनम्र व्यवहार" },
+          { id: "repair", label: "तेज़ सर्विस / रिपेयर", phrase: "तुरंत और भरोसेमंद सर्विस" },
+          { id: "stock", label: "शानदार वैरायटी", phrase: "मोबाइल फोन और एक्सेसरीज़ का बेहतरीन स्टॉक" },
+          { id: "trust", label: "विश्वसनीय", phrase: "पूरी तरह से भरोसेमंद और सही सलाह" },
+          { id: "deal", label: "आसान खरीदारी", phrase: "खरीदारी का बहुत ही सरल और सुखद अनुभव" }
+        ],
+        template: (phrases) => `यहाँ बहुत अच्छा अनुभव रहा! ${phrases} बहुत पसंद आया। जरूर विजिट करें!`
+      }
+    };
+
+    function renderTags() {
+      const container = document.getElementById("tagsContainer");
+      container.innerHTML = "";
+      const currentTags = content[currentLang].tags;
+
+      currentTags.forEach(item => {
+        const chip = document.createElement("div");
+        chip.className = `chip ${selectedTags.has(item.id) ? "active" : ""}`;
+        chip.textContent = item.label;
+        chip.onclick = () => toggleTag(item.id);
+        container.appendChild(chip);
+      });
+
+      updateReviewOutput();
+    }
+
+    function toggleTag(tagId) {
+      if (selectedTags.has(tagId)) {
+        selectedTags.delete(tagId);
+      } else {
+        selectedTags.add(tagId);
+      }
+      renderTags();
+    }
+
+    function updateReviewOutput() {
+      const output = document.getElementById("reviewOutput");
+      if (selectedTags.size === 0) {
+        output.value = "";
+        return;
+      }
+
+      const activePhrases = content[currentLang].tags
+        .filter(t => selectedTags.has(t.id))
+        .map(t => t.phrase);
+
+      const joined = activePhrases.join(currentLang === 'hi' ? ", " : ", ");
+      output.value = content[currentLang].template(joined);
+    }
+
+    function switchLang(lang) {
+      currentLang = lang;
+      document.getElementById("btnEn").classList.toggle("active", lang === "en");
+      document.getElementById("btnHi").classList.toggle("active", lang === "hi");
+
+      document.getElementById("titleText").textContent = content[lang].title;
+      document.getElementById("subText").textContent = content[lang].subtitle;
+      document.getElementById("tagSectionTitle").textContent = content[lang].highlights;
+      document.getElementById("previewTitle").textContent = content[lang].preview;
+      document.getElementById("btnLabel").textContent = content[lang].btnLabel;
+      document.getElementById("helperNote").textContent = content[lang].note;
+
+      renderTags();
+    }
+
+    async function handleCopyAndRedirect() {
+      const text = document.getElementById("reviewOutput").value.trim();
+      const toast = document.getElementById("toast");
+
+      if (text.length > 0) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          // Fallback for older webviews
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+      }
+
+      toast.textContent = content[currentLang].toast;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        window.location.href = GOOGLE_REVIEW_URL;
+      }, 700);
+    }
+
+    // Initial run
+    renderTags();
+  </script>
+</body>
+</html>
